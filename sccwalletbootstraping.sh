@@ -2,6 +2,7 @@
 
 coinname=stakecubecoin
 coindir=stakecubecoin
+coindir2=scc
 snapshot='https://stakecubecoin.net/bootstrap.zip'
 
 #pre-setup checks and dependencies installs
@@ -76,6 +77,7 @@ if [[ $linuxextraction == "yes" ]]
 						echo -e "${RED}File doesn't exist${NC}, ${YELLOW}downloading chain${NC}"
 						wget -nv --show-progress ${snapshot} -O ${coinname}.zip
 						unzip ${coinname}.zip
+						mv ~/.${coindir2}/* ~/.${coinname}
 						echo -e "${YELLOW}$coinname chain directory updated${NC}"
 						echo -e "${YELLOW}Removing downloaded temp file${NC}"
 						rm ~/${coinname}.zip
@@ -83,6 +85,7 @@ if [[ $linuxextraction == "yes" ]]
 			else
 				wget -nv --show-progress ${snapshot} -O ${coinname}.zip
 				unzip ${coinname}.zip
+				mv ~/.${coindir2}/* ~/.${coinname}
 				echo -e ""
 				echo -e "${YELLOW}$coinname chain directory setup${NC}"
 				echo -e "${YELLOW}Removing downloaded temp file${NC}"
