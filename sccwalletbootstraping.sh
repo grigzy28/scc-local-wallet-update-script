@@ -43,54 +43,37 @@ if [[ $updatechainfile == "yes" ]]
 		echo -e ""
 fi
 
-if [[ $linuxextraction == "yes" ]]	
+if [[ $linuxextraction == "yes" ]]
 	then
-		echo -e "${YELLOW}Do you wish to update the offline chain file first?"
-		echo -e "${CYAN}Please enter ${MAGENTA}yes${NC} ${CYAN}or${NC} ${MAGENTA}no${CYAN} only${NC}"
-		read updatechainfile
-
-		if [[ $updatechainfile == "yes" ]]
-			then
-				echo -e "${CYAN}Downloading updated bootstrap for offline install/repair${NC}"
-				cd ~
-				wget -nv --show-progress ${snapshot} -O ${coinname}.zip
-				echo -e ""
-		fi
-
 		find ~/.${coindir}/ -name ".lock" -delete
 		find ~/.${coindir}/ -name ".walletlock" -delete
 		find ~/.${coindir}/* ! -name "wallet.dat" ! -name "*.conf" -delete
 		echo -e "${YELLOW}Downloading/Copying and replacing chain files for ${MAGENTA}$alias${NC}"
 
-		if [[ $bootstrapchoice == yes ]]
+		sccfile=~/${coinname}.zip
+
+		if test -e "$sccfile"
 			then
-				sccfile=~/${coinname}.zip
-				
-				if test -e "$sccfile"
-					then 
-						#rsync -adm --info=progress2 /root/${coinname}.zip /home/$alias
-						unzip ~/${coinname}.zip
-						echo -e "${YELLOW}$coinname local bootstrap directory updated${NC}"
-						#echo -e "${YELLOW}Removing copied temp file${NC}"
-						#rm /home/${alias}/${coinname}.zip
-					else
-						echo -e "${RED}File doesn't exist${NC}, ${YELLOW}downloading chain${NC}"
-						wget -nv --show-progress ${snapshot} -O ${coinname}.zip
-						unzip ${coinname}.zip
-						mv ~/.${coindir2}/* ~/.${coinname}
-						echo -e "${YELLOW}$coinname chain directory updated${NC}"
-						echo -e "${YELLOW}Removing downloaded temp file${NC}"
-						rm ~/${coinname}.zip
-				fi	
+				#rsync -adm --info=progress2 /root/${coinname}.zip /home/$alias
+				unzip ~/${coinname}.zip
+				rsync -r --info=progress2 ~/.${coindir2}/* ~/.${coinname}
+				rm -f -r .${coindir2}
+				echo -e "${YELLOW}$coinname local bootstrap directory updated${NC}"
+				#echo -e "${YELLOW}Removing copied temp file${NC}"
+				#rm /home/${alias}/${coinname}.zip
 			else
+				echo -e "${RED}File doesn't exist${NC}, ${YELLOW}downloading chain${NC}"
 				wget -nv --show-progress ${snapshot} -O ${coinname}.zip
 				unzip ${coinname}.zip
-				mv ~/.${coindir2}/* ~/.${coinname}
-				echo -e ""
-				echo -e "${YELLOW}$coinname chain directory setup${NC}"
+				rsync -r --info=progress2 ~/.${coindir2}/* ~/.${coinname}
+				rm -f -r .${coindir2}
+				echo -e "${YELLOW}$coinname chain directory updated${NC}"
 				echo -e "${YELLOW}Removing downloaded temp file${NC}"
 				rm ~/${coinname}.zip
 		fi
+
 	else
 		echo -e "${YELLOW}Not running tool${NC}"
+		exit
 fi
+
